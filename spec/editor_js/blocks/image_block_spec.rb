@@ -5,7 +5,9 @@ RSpec.describe EditorJs::Blocks::ImageBlock do
     {
       type: 'image',
       data: {
-        url: 'http://xxx/image.png',
+        file: {
+          url: 'http://xxx/image.png'
+        },
         caption: 'this is a <b>caption</b> &lt;hello&gt; world',
         withBorder: false,
         withBackground: false,

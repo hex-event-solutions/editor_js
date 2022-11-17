@@ -7,12 +7,16 @@ module EditorJs
       def schema
         YAML.safe_load(<<~YAML)
           type: object
-          additionalProperties: false
+          additionalProperties: true
           properties:
             caption:
               type: string
-            url:
-              type: string
+            file:
+              type: object
+              additionalProperties: true
+              properties:
+                url:
+                  type: string
             stretched:
               type: boolean
             withBackground:
@@ -20,13 +24,13 @@ module EditorJs
             withBorder:
               type: boolean
           required:
-          - url
+          - file
         YAML
       end
 
       def render(_options = {})
         content_tag :div, class: css_name do
-          url = data['url']
+          url = data['file']['url']
           caption = data['caption']
           withBorder = data['withBorder']
           withBackground = data['withBackground']
@@ -37,9 +41,9 @@ module EditorJs
           html_class += " #{css_name}__picture--with-background" if withBackground
           html_class += " #{css_name}__picture--with-border" if withBorder
 
-          html_str =  content_tag :div, class: html_class do
-                        content_tag :img, '', src: url
-                      end
+          html_str = content_tag :div, class: html_class do
+            content_tag :img, '', src: url
+          end
           html_str << content_tag(:div, caption.html_safe, class: "#{css_name}__caption").html_safe
         end
       end
@@ -47,9 +51,7 @@ module EditorJs
       def sanitize!
         %w[caption url].each do |key|
           str = Sanitize.fragment(data[key], remove_contents: true).strip
-          if key == 'url'
-            str.gsub!('&amp;', '&')
-          end
+          str.gsub!('&amp;', '&') if key == 'url'
           data[key] = str
         end
       end
